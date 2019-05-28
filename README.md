@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
@@ -65,9 +64,3 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/ad
 This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
 
 ### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
-=======
-# simple_todo_list
-A TODO list using React
->>>>>>> 8270f7dfed1c2565768ac5cd4ccc12cbad0056a7
