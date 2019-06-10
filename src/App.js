@@ -1,62 +1,81 @@
-import React from "react";
-import TodoList from "./TodoList/todoList";
-import AddTodo from "./AddTodo/addTodo";
+import React, { Component } from "react";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import Header from "./components/layout/Header";
+import Todos from "./components/Todos";
+import AddTodo from "./components/AddTodo";
+import About from "./components/pages/About";
+// import uuid from "uuid";
 
 import "./App.css";
+import axios from "axios";
 
-class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      todos: []
-    };
+class App extends Component {
+  state = {
+    todos: []
+  };
+
+  componentDidMount() {
+    axios
+      .get("https://jsonplaceholder.typicode.com/todos?_limit=10")
+      .then(res => this.setState({ todos: res.data }));
   }
+
+  // Toggle complete
+  markComplete = id => {
+    this.setState({
+      todos: this.state.todos.map(todo => {
+        if (todo.id === id) {
+          todo.completed = !todo.completed;
+        }
+        return todo;
+      })
+    });
+  };
+
+  // Delete todo
+  delTodo = id => {
+    axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`).then(res =>
+      this.setState({
+        todos: [...this.state.todos.filter(todo => todo.id !== id)]
+      })
+    );
+  };
+
+  addTodo = title => {
+    axios
+      .post("https://jsonplaceholder.typicode.com/todos", {
+        title,
+        completed: false
+      })
+      .then(res => this.setState({ todos: [...this.state.todos, res.data] }));
+  };
 
   render() {
     return (
-      <div>
-        <AddTodo addTodoFn={this.addTodo} />
-        <TodoList updateTodoFn={this.updateTodo} todos={this.state.todos} />
-      </div>
+      <Router>
+        <div className="App">
+          <div className="container">
+            <Header />
+            <Route
+              exact
+              path="/"
+              render={props => (
+                <React.Fragment>
+                  <AddTodo addTodo={this.addTodo} />
+                  <Todos
+                    todos={this.state.todos}
+                    markComplete={this.markComplete}
+                    delTodo={this.delTodo}
+                  />
+                </React.Fragment>
+              )}
+            />
+            <Route path="/about" component={About} />
+          </div>
+        </div>
+      </Router>
     );
   }
-
-  componentDidMount = () => {
-    const todos = localStorage.getItem("todos");
-    if (todos) {
-      const savedTodos = JSON.parse(todos);
-      this.setState({ todos: savedTodos });
-    } else {
-      console.log("No todos");
-    }
-  };
-
-  addTodo = async todo => {
-    await this.setState({
-      todos: [
-        ...this.state.todos,
-        {
-          text: todo,
-          completed: false
-        }
-      ]
-    });
-    localStorage.setItem("todos", JSON.stringify(this.state.todos));
-    console.log(localStorage.getItem("todos"));
-  };
-
-  updateTodo = async (todo) => {
-    const newTodos = this.state.todos.map(_todo => {
-      if (todo === _todo)
-        return {
-          text: todo.text,
-          completed: !todo.completed
-        };
-      else return _todo;
-    });
-    await this.setState({ todos: newTodos });
-    localStorage.setItem('todos',JSON.stringify(this.state.todos));
-  };
 }
 
 export default App;
